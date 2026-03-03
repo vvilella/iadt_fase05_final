@@ -1,0 +1,115 @@
+# STRIDE catalog (MVP)
+# Each component type maps to STRIDE categories with typical vulnerabilities and mitigations.
+
+user:
+  Spoofing:
+    vulns:
+      - "Account takeover via weak authentication"
+      - "Session hijacking"
+    mitigations:
+      - "MFA / strong authentication"
+      - "Secure session management (httpOnly, secure cookies, short TTL)"
+  Repudiation:
+    vulns:
+      - "Lack of audit trail for user actions"
+    mitigations:
+      - "Centralized logging with tamper-evident storage"
+      - "Correlate requests with trace/request IDs"
+
+web_app:
+  Tampering:
+    vulns:
+      - "Client-side parameter tampering"
+      - "Supply-chain issues in frontend dependencies"
+    mitigations:
+      - "Server-side validation"
+      - "Dependency pinning + SCA scanning"
+  InformationDisclosure:
+    vulns:
+      - "Sensitive data in client storage or logs"
+    mitigations:
+      - "Avoid storing secrets in client"
+      - "Redact sensitive data in logs"
+  DoS:
+    vulns:
+      - "No rate limiting / WAF protection"
+    mitigations:
+      - "Rate limiting, WAF, CDN caching"
+
+gateway:
+  Spoofing:
+    vulns:
+      - "Missing/weak auth at entry point"
+    mitigations:
+      - "Enforce authn/authz at gateway (JWT/mTLS/OAuth2)"
+  Tampering:
+    vulns:
+      - "Request/response manipulation without integrity controls"
+    mitigations:
+      - "TLS everywhere, request signing where needed"
+  DoS:
+    vulns:
+      - "No throttling; vulnerable to request floods"
+    mitigations:
+      - "Rate limiting, quotas, circuit breakers"
+
+service:
+  ElevationOfPrivilege:
+    vulns:
+      - "Over-privileged service accounts"
+      - "Missing authorization checks"
+    mitigations:
+      - "Least privilege IAM; fine-grained authorization"
+      - "Policy-as-code and reviews"
+  Tampering:
+    vulns:
+      - "Insecure deserialization / injection risks"
+    mitigations:
+      - "Input validation, parameterized queries, secure coding practices"
+  Repudiation:
+    vulns:
+      - "Insufficient logging/tracing"
+    mitigations:
+      - "Structured logs + tracing (OpenTelemetry) + request IDs"
+  DoS:
+    vulns:
+      - "Resource exhaustion (threads, memory, DB connections)"
+    mitigations:
+      - "Timeouts, bulkheads, autoscaling, circuit breakers"
+
+database:
+  InformationDisclosure:
+    vulns:
+      - "Unencrypted data at rest"
+      - "Broad access permissions"
+    mitigations:
+      - "Encryption at rest; secrets management"
+      - "Least privilege + row/column level controls"
+  Tampering:
+    vulns:
+      - "Unauthorized writes / data corruption"
+    mitigations:
+      - "Strong auth, RBAC, integrity constraints"
+      - "Backups + point-in-time recovery"
+  DoS:
+    vulns:
+      - "Unbounded queries / expensive joins"
+    mitigations:
+      - "Query limits, indexing, connection pooling"
+
+external_service:
+  Spoofing:
+    vulns:
+      - "Weak trust of third-party identity"
+    mitigations:
+      - "mTLS/OAuth2 with strict audience/scopes"
+  InformationDisclosure:
+    vulns:
+      - "Data leakage to third parties"
+    mitigations:
+      - "Data minimization; contracts + DLP controls"
+  DoS:
+    vulns:
+      - "Third-party outage impacting core flows"
+    mitigations:
+      - "Retries with backoff, circuit breakers, graceful degradation"
