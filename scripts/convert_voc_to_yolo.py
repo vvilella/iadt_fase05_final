@@ -11,6 +11,7 @@ SOURCE_ROOT = Path("data/kaggle_raw")
 YOLO_ROOT = Path("data/yolo")
 MAPPING_FILE = Path("data/class_mapping.yaml")
 TRAIN_SPLIT = 0.8
+MAX_SAMPLES = 300  # limitar dataset
 
 CLASSES = [
     "user",
@@ -60,6 +61,8 @@ def main():
     mapping = load_mapping()
 
     xml_files = list(SOURCE_ROOT.rglob("*.xml"))
+    random.shuffle(xml_files)
+    xml_files = xml_files[:MAX_SAMPLES]
     random.shuffle(xml_files)
 
     split_index = int(len(xml_files) * TRAIN_SPLIT)
