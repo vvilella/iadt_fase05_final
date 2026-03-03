@@ -1,0 +1,43 @@
+# Mapeamento de classes específicas (cloud icons) -> 6 classes do MVP
+
+gateway:
+  - api_gateway
+  - application_gateway
+  - load_balancer
+
+database:
+  - sql
+  - database
+  - storage
+  - cloud_storage
+  - rds
+  - cosmos
+  - dynamodb
+
+service:
+  - lambda
+  - function
+  - kubernetes
+  - container
+  - service
+  - app_service
+  - databricks
+  - queue
+  - monitor
+  - data_factory
+  - synapse
+
+web_app:
+  - web
+  - frontend
+  - app
+
+external_service:
+  - devops
+  - third_party
+  - external
+
+user:
+  - user
+  - client
+  - admin
