@@ -39,3 +39,8 @@ data/yolo/labels/
 
 # Processed data
 data/processed/
+
+# Ultralytics / training artifacts
+runs/
+notebooks/runs/
+**/*.pt

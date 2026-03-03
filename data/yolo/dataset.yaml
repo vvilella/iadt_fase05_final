@@ -1,4 +1,4 @@
-path: data/yolo
+path: /Users/vilella/Documents/fiap/pos_ia/iadt_fase05_final/data/yolo
 train: images/train
 val: images/val
 
