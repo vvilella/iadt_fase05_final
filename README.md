@@ -47,7 +47,19 @@ O relatório final apresenta:
 - recomendações de mitigação
 
 ---
+# Dataset
 
+O dataset utilizado neste projeto foi obtido a partir de um dataset público contendo ícones de serviços cloud e componentes arquiteturais.
+
+As anotações originais estão no formato VOC/XML e foram utilizadas como base para o treinamento supervisionado do modelo.
+
+Referência do dataset:
+
+https://www.kaggle.com/datasets/carlosrian/software-architecture-dataset
+
+Neste projeto, as classes originais foram consolidadas em seis macroclasses arquiteturais para simplificar o problema de detecção e viabilizar o treinamento do modelo em um ambiente computacional limitado.
+
+---
 # Classes Utilizadas no MVP
 
 Para simplificar o problema, diferentes serviços e ícones de arquitetura foram consolidados em seis macroclasses.
