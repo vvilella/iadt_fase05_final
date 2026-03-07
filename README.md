@@ -1,151 +1,227 @@
-# IADT Fase 05 --- Hackathon
 
-## Arquitetura + Detecção Automática + STRIDE
+# IADT Fase 05 — Hackathon
+## Detecção de Componentes Arquiteturais + STRIDE
 
-Este projeto implementa um pipeline end-to-end para:
+Este projeto apresenta um MVP que combina visão computacional com modelagem de ameaças baseada em STRIDE para automatizar a análise inicial de segurança de diagramas de arquitetura.
 
-1.  Converter dataset anotado (VOC/XML) em YOLO\
-2.  Treinar um detector de objetos (YOLOv8)\
-3.  Detectar componentes arquiteturais em diagramas\
-4.  Gerar automaticamente um relatório de ameaças baseado em STRIDE
+A ideia central é simples: receber um diagrama como imagem, identificar automaticamente os principais componentes arquiteturais e gerar um relatório com ameaças e recomendações de mitigação.
 
-------------------------------------------------------------------------
+O objetivo não é substituir a análise de um especialista em segurança, mas acelerar a identificação inicial de riscos em arquiteturas de sistemas.
 
-# Objetivo
+---
 
-Dado um diagrama de arquitetura (imagem), o sistema:
+# Pipeline da Solução
 
--   Detecta componentes (gateway, service, database, etc.)
--   Classifica cada componente
--   Gera inventário técnico
--   Produz relatório STRIDE automático com:
-    -   vulnerabilidades típicas
-    -   recomendações de mitigação
+O sistema segue o fluxo abaixo:
 
-------------------------------------------------------------------------
+Diagrama de arquitetura (imagem)  
+↓  
+Detecção de componentes arquiteturais (YOLOv8)  
+↓  
+Classificação em macroclasses arquiteturais  
+↓  
+Consulta a catálogo de ameaças baseado em STRIDE  
+↓  
+Geração automática de relatório de segurança
 
-# Classes do MVP
+Esse pipeline permite transformar um diagrama visual em uma análise inicial de ameaças de forma automatizada.
 
-  ID   Classe
-  ---- ------------------
-  0    user
-  1    web_app
-  2    gateway
-  3    service
-  4    database
-  5    external_service
+---
 
-------------------------------------------------------------------------
+# Objetivo do Projeto
+
+Dado um diagrama de arquitetura representado como imagem, o sistema é capaz de:
+
+- Detectar automaticamente componentes arquiteturais
+- Classificar os componentes identificados
+- Gerar um inventário técnico da arquitetura
+- Produzir um relatório de ameaças baseado em STRIDE
+- Sugerir contramedidas associadas a cada tipo de ameaça
+
+O relatório final apresenta:
+
+- componentes detectados
+- bounding boxes
+- nível de confiança das detecções
+- ameaças típicas associadas ao componente
+- recomendações de mitigação
+
+---
+
+# Classes Utilizadas no MVP
+
+Para simplificar o problema, diferentes serviços e ícones de arquitetura foram consolidados em seis macroclasses.
+
+| ID | Classe |
+|---|---|
+| 0 | user |
+| 1 | web_app |
+| 2 | gateway |
+| 3 | service |
+| 4 | database |
+| 5 | external_service |
+
+Esse agrupamento permite tratar diferentes tecnologias como papéis arquiteturais equivalentes, simplificando o treinamento do modelo.
+
+---
+
+# Metodologia
+
+O dataset original contém anotações em formato VOC/XML com ícones representando serviços cloud.
+
+O processo utilizado foi:
+
+1. Importação do dataset original
+2. Mapeamento das classes para as seis macroclasses do projeto
+3. Conversão das anotações para o formato YOLO
+4. Geração de dataset de treino e validação
+5. Treinamento de um detector YOLOv8n
+
+O objetivo foi validar a viabilidade do pipeline completo utilizando um modelo leve.
+
+---
 
 # Estrutura do Projeto
 
-    data/
-     ├── kaggle_raw/           # Dataset bruto (ignorado no Git)
-     ├── yolo/                 # Dataset convertido (YOLO format)
-     ├── catalog/              # Catálogo STRIDE
-     ├── class_mapping.yaml    # Regras de mapeamento
-     └── eval/images/          # Imagens do challenge
+```
+data/
+ ├── kaggle_raw/           dataset original (não versionado)
+ ├── yolo/                 dataset convertido para YOLO
+ ├── catalog/              catálogo STRIDE
+ ├── class_mapping.yaml    regras de mapeamento das classes
+ └── eval/images/          imagens de arquitetura utilizadas na avaliação
 
-    scripts/
-     └── convert_voc_to_yolo.py
+scripts/
+ └── convert_voc_to_yolo.py
 
-    notebooks/
-     ├── 01_dataset.ipynb
-     ├── 02_train.ipynb
-     └── 03_infer_and_report.ipynb
+notebooks/
+ ├── 01_dataset.ipynb
+ ├── 02_train.ipynb
+ └── 03_infer_and_report.ipynb
 
-    src/
-     └── report.py
+src/
+ └── report.py
 
-------------------------------------------------------------------------
+assets/
+ └── outputs/
+     └── report.md
+```
+
+---
 
 # Setup
 
-``` bash
-python3 -m venv .venv
-source .venv/bin/activate
+Criar ambiente virtual:
+
+python3 -m venv .venv  
+source .venv/bin/activate  
+
+Instalar dependências:
+
 pip install -r requirements.txt
-```
 
-------------------------------------------------------------------------
+---
 
-# 1. Converter Dataset
+# 1. Conversão do Dataset
 
-``` bash
+Script responsável por converter as anotações VOC para YOLO:
+
 python scripts/convert_voc_to_yolo.py
-```
 
-Esse passo:
+Esse passo realiza:
 
--   Aplica o mapeamento das classes originais para as 6 classes do MVP
--   Seleciona amostra aleatória controlada
--   Gera split train/val
--   Cria dataset no formato YOLO
+- aplicação do mapeamento de classes
+- seleção de amostra do dataset
+- criação do split train / validation
+- geração do dataset no formato YOLO
 
-------------------------------------------------------------------------
+---
 
-# 2. Treinar Modelo
+# 2. Treinamento do Modelo
 
 Abra o notebook:
 
-    notebooks/02_train.ipynb
+notebooks/02_train.ipynb
 
-O modelo treinado será salvo em:
+O treinamento utiliza YOLOv8n, uma versão leve da arquitetura YOLO.
 
-    runs/detect_train_mvp3/weights/best.pt
+O modelo treinado é salvo em:
 
-------------------------------------------------------------------------
+runs/detect_train_mvp3/weights/best.pt
 
-# 3. Rodar Inferência
+---
 
-Coloque as imagens do challenge em:
+# 3. Inferência
 
-    data/eval/images/
+Coloque as imagens do desafio em:
+
+data/eval/images/
 
 Execute:
 
-    notebooks/03_infer_and_report.ipynb
+notebooks/03_infer_and_report.ipynb
 
-Saída gerada:
+Esse notebook realiza:
 
-    assets/outputs/report.md
+- carregamento do modelo treinado
+- detecção de componentes na imagem
+- extração de bounding boxes e confiança
+- geração do relatório STRIDE
 
-------------------------------------------------------------------------
+Saída:
 
-# Exemplo de Saída
+assets/outputs/report.md
 
-O relatório inclui:
+---
 
--   Inventário de componentes detectados
--   Bounding boxes
--   Confiança por detecção
--   Ameaças STRIDE por tipo de componente
--   Mitigações recomendadas
+# Exemplo de Resultado
 
-------------------------------------------------------------------------
+O relatório final inclui:
+
+- inventário de componentes detectados
+- bounding boxes
+- confiança das detecções
+- ameaças STRIDE associadas ao componente
+- recomendações de mitigação
+
+---
 
 # Limitações Conhecidas
 
--   Dataset base composto majoritariamente por ícones cloud
-    (AWS/Azure/GCP)
--   Classes abstratas como user e web_app possuem menor recall
--   Modelo treinado com subset (MVP)
--   Detector YOLOv8n (modelo leve)
+Algumas limitações importantes do MVP:
 
-------------------------------------------------------------------------
+- dataset composto majoritariamente por ícones de serviços cloud
+- classes abstratas como user e web_app possuem menor recall
+- treinamento realizado com subset do dataset
+- modelo utilizado é YOLOv8n (modelo leve)
 
-# Evoluções Futuras
+Essas limitações são esperadas em um protótipo voltado à validação do pipeline.
 
--   Balanceamento por classe
--   Fine-tuning adicional
--   Data augmentation direcionado
--   Pós-processamento para deduplicação
--   Exportação automática para PDF
+---
 
-------------------------------------------------------------------------
+# Possíveis Evoluções
 
-# Resultado
+Algumas melhorias possíveis para versões futuras:
 
-Pipeline funcional:
+- balanceamento das classes do dataset
+- aumento do volume de dados de treino
+- data augmentation direcionado
+- análise de fluxos entre componentes
+- geração automática de relatórios em PDF
+- integração com ferramentas de documentação de arquitetura
 
-Diagrama → Detecção → Classificação → STRIDE → Relatório Markdown
+---
+
+# Conclusão
+
+Este projeto demonstra que é possível integrar:
+
+- visão computacional
+- detecção de componentes arquiteturais
+- modelagem de ameaças baseada em STRIDE
+
+para automatizar uma primeira análise de segurança a partir de diagramas de arquitetura.
+
+Pipeline final:
+
+Diagrama → Detecção → Classificação → STRIDE → Relatório
